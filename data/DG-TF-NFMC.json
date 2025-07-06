@@ -1,6 +1,7 @@
 {
-  "name": "Emily",
-  "message": "Hi Emily, welcome to your Little Homepage!",
-  "buttonText": "Hug",
-  "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/320px-Cat03.jpg"
+  "recipientName": "Danny",
+  "gifterName": "Jess",
+  "phoneNumber": "2125551234",
+  "venmoUser": "@jessgifts",
+  "imageUrl": "https://drive.google.com/file/d/1A2B3C4D5E6F7G8H9I0J1K2L3M4N5O6P7/view?usp=sharing"
 }
