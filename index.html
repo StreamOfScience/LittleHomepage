@@ -1,70 +1,147 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Little Homepage</title>
+  <title>Homepage</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f0f8ff;
-      color: #222;
-      padding: 40px 20px;
-      max-width: 700px;
-      margin: 0 auto;
+      font-family: 'Trebuchet MS', sans-serif;
+      background-color: #e6f7ff;
       text-align: center;
+      padding: 40px 20px;
     }
+
     h1 {
-      font-size: 2.5em;
-      margin-bottom: 0.4em;
+      color: #d63384;
+      font-size: 2em;
+      margin-bottom: 50px;
+      text-decoration: underline;
     }
-    .section {
-      margin: 1.5em 0;
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+
+    .button {
+      display: block;
+      margin: 12px auto;
+      padding: 15px 25px;
+      width: 80%;
+      max-width: 300px;
+      font-size: 1.05em;
+      color: white;
+      background-color: #d63384;
+      border: 2px solid black;
+      border-radius: 12px;
+      text-decoration: none;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.2s ease;
     }
-    .label {
-      font-weight: bold;
-      color: #333;
+
+    .button:hover {
+      background-color: #c21868;
+    }
+
+    .back-button {
+      background-color: #6c757d;
+    }
+
+    .back-button:hover {
+      background-color: #5a6268;
+    }
+
+    .floating-logo {
+      position: fixed;
+      top: 50px;
+      left: 50px;
+      width: 100px;
+      border-radius: 50%;
+      animation: float 10s infinite ease-in-out alternate;
+      z-index: 999;
+    }
+
+    @keyframes float {
+      0% { transform: translate(0, 0); }
+      25% { transform: translate(80vw, 20vh); }
+      50% { transform: translate(30vw, 50vh); }
+      75% { transform: translate(70vw, 70vh); }
+      100% { transform: translate(10vw, 20vh); }
+    }
+
+    .footer {
+      margin-top: 40px;
+      font-size: 0.7em;
+    }
+
+    .footer a {
+      color: inherit;
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
-  <h1>Welcome to Little Homepage</h1>
-  <div id="content">Loading...</div>
+  <!-- Floating Logo -->
+  <img src="" alt=" " class="floating-logo" id="floatingImage" />
+
+  <h1 id="homepageTitle"></h1>
+
+  <a class="button" id="callBtn" href="#">📱 Call</a>
+  <a class="button" id="textBtn" href="#">💬 Text</a>
+  <a class="button" id="hugBtn" href="#">🤗 Hug</a>
+  <a class="button" id="feedBtn" href="#">🍣️ Feed</a>
+  <a class="button" id="venmoBtn" href="#">💵 Gift</a>
+  <a class="button back-button" href="https://www.google.com" target="_blank">😞 Back to Work</a>
+
+  <p class="footer" id="footerText"></p>
 
   <script>
-    const params = new URLSearchParams(window.location.search);
-    const userId = params.get('user');
+    async function fetchUserData() {
+      const params = new URLSearchParams(window.location.search);
+      const userId = params.get('user');
+      if (!userId) {
+        document.body.innerHTML = "<p>User ID not found in URL.</p>";
+        return;
+      }
 
-    const contentDiv = document.getElementById('content');
+      try {
+        const response = await fetch(`data/${userId}.json`);
+        const data = await response.json();
 
-    if (!userId) {
-      contentDiv.innerHTML = "<p>No user ID provided in the URL.</p>";
-    } else {
-      fetch(`data/${userId}.json`)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error("User data not found.");
-          }
-          return response.json();
-        })
-        .then(data => {
-          contentDiv.innerHTML = `
-            <div class="section">
-              <p><span class="label">Gift Recipient:</span> ${data.recipientFirstName}</p>
-              <p><span class="label">Gift Giver:</span> ${data.giverFirstName}</p>
-              <p><span class="label">Theme:</span> ${data.theme}</p>
-              <p><span class="label">Message:</span> ${data.message}</p>
-            </div>
-          `;
-        })
-        .catch(error => {
-          contentDiv.innerHTML = `<p>Error loading data: ${error.message}</p>`;
-        });
+        const recipientName = data.recipientName;
+        const gifterName = data.gifterName;
+        const phoneNumber = data.phoneNumber;
+        const venmoUser = data.venmoUser;
+        const imageIdMatch = data.imageUrl.match(/[-\w]{25,}/);
+        const imageUrl = imageIdMatch ? 
+          `https://drive.google.com/thumbnail?id=${imageIdMatch[0]}` : '';
+
+        document.getElementById("homepageTitle").innerText = `${recipientName}'s Homepage`;
+        document.getElementById("callBtn").href = `tel:${phoneNumber}`;
+        document.getElementById("callBtn").innerText = `📱 Call ${gifterName}`;
+
+        document.getElementById("textBtn").href = `sms:${phoneNumber}`;
+        document.getElementById("textBtn").innerText = `💬 Text ${gifterName}`;
+
+        const hugGifUrl = encodeURIComponent("https://media.tenor.com/24n__MYJspQAAAAM/hug.gif");
+        document.getElementById("hugBtn").href = `sms:${phoneNumber}?&body=${hugGifUrl}`;
+        document.getElementById("hugBtn").innerText = `🤗 Hug ${gifterName}`;
+
+        document.getElementById("feedBtn").href = "https://www.ubereats.com";
+        document.getElementById("feedBtn").innerText = `🍣️ Feed ${gifterName}`;
+
+        document.getElementById("venmoBtn").href = `venmo://paycharge?txn=pay&recipients=${venmoUser}`;
+        document.getElementById("venmoBtn").innerText = `💵 Gift ${gifterName}`;
+
+        document.getElementById("footerText").innerHTML =
+          `Made with love by ${gifterName} and <a href=\"https://www.littlehomepage.com\" target=\"_blank\">LittleHomepage.com</a>`;
+
+        if (imageUrl) {
+          document.getElementById("floatingImage").src = imageUrl;
+        }
+      } catch (error) {
+        document.body.innerHTML = `<p>Error loading user data.</p>`;
+      }
     }
+
+    fetchUserData();
   </script>
 </body>
 </html>
