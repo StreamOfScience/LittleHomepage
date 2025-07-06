@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Little Homepage</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0f8ff;
+      color: #222;
+      padding: 40px 20px;
+      max-width: 700px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 0.4em;
+    }
+    .section {
+      margin: 1.5em 0;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .label {
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <h1>Welcome to Little Homepage</h1>
+  <div id="content">Loading...</div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const userId = params.get('user');
+
+    const contentDiv = document.getElementById('content');
+
+    if (!userId) {
+      contentDiv.innerHTML = "<p>No user ID provided in the URL.</p>";
+    } else {
+      fetch(`data/${userId}.json`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("User data not found.");
+          }
+          return response.json();
+        })
+        .then(data => {
+          contentDiv.innerHTML = `
+            <div class="section">
+              <p><span class="label">Gift Recipient:</span> ${data.recipientFirstName}</p>
+              <p><span class="label">Gift Giver:</span> ${data.giverFirstName}</p>
+              <p><span class="label">Theme:</span> ${data.theme}</p>
+              <p><span class="label">Message:</span> ${data.message}</p>
+            </div>
+          `;
+        })
+        .catch(error => {
+          contentDiv.innerHTML = `<p>Error loading data: ${error.message}</p>`;
+        });
+    }
+  </script>
+</body>
+</html>
